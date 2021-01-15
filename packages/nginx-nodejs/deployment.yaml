@@ -1,0 +1,38 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+    name: nginx-nodejs
+    labels:
+        app: nginx-nodejs
+spec:
+    replicas: 1
+    selector:
+        matchLabels:
+            app: nginx-nodejs
+    template:
+        metadata:
+            labels:
+                app: nginx-nodejs
+        spec:
+            containers:
+                - name: nginx-nodejs
+                  image: localhost:5000/nginx-nodejs
+                  imagePullPolicy: Always
+                  ports:
+                      - containerPort: 8080
+            restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: nginx-nodejs
+spec:
+    selector:
+        app: nginx-nodejs
+    type: NodePort
+    ports:
+        - protocol: TCP
+          port: 8080
+          targetPort: 8080
+          nodePort: 31001
