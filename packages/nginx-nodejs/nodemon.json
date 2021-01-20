@@ -1,5 +1,5 @@
 {
-  "watch": ["src"],
-  "exec": "tsc && node dist/index.js",
-  "ext": "js ts"
+    "watch": ["src"],
+    "exec": "yarn clean && yarn copy-files && tsc && node dist/index.js",
+    "ext": "js ts"
 }
