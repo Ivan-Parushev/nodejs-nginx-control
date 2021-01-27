@@ -1,6 +1,16 @@
 {
   "name": "nginx-poc",
   "private": true,
+  "scripts": {
+    "start": "lerna run --scope @nginx/* --parallel start",
+    "build": "lerna run --scope @nginx/* build",
+    "serve": "lerna run --scope @nginx/* --parallel serve",
+    "dockerize": "lerna run --scope @nginx/* --parallel dockerize",
+    "tag:push": "lerna run --scope @nginx/* --parallel tag:push",
+    "deploy": "kubectl apply -f deployment.yaml",
+    "delete": "kubectl delete service/nginx-poc-service pod/nginx-poc persistentvolumeclaim/p-volumeclaim persistentvolume/p-volume  --force --grace-period=0",
+    "deploy:changes": "yarn delete && yarn build && yarn dockerize && yarn tag:push && yarn deploy"
+  },
   "devDependencies": {
     "lerna": "^3.22.1"
   },

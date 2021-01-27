@@ -1,0 +1,86 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: p-volume
+  labels:
+    type: local
+spec:
+  storageClassName: pv-demo
+  capacity:
+    storage: 100Mi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  hostPath:
+    path: "/mnt"
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: p-volumeclaim
+spec:
+  storageClassName: pv-demo
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Mi
+
+---
+kind: Pod
+apiVersion: v1
+metadata:
+  name: nginx-poc
+  labels:
+    app: nginx-poc
+
+spec:
+  volumes:
+    - name: p-volumeclaim-name
+      persistentVolumeClaim:
+        claimName: p-volumeclaim
+
+  containers:
+    - name: nginx-react
+      image: localhost:5000/nginx-react
+      imagePullPolicy: Always
+      securityContext:
+        privileged: true
+      ports:
+        - containerPort: 80
+      volumeMounts:
+        - name: p-volumeclaim-name
+          mountPath: /etc/nginx/sites-enabled/locations
+
+    - name: nginx-nodejs
+      image: localhost:5000/nginx-nodejs
+      imagePullPolicy: Always
+      securityContext:
+        privileged: true
+      ports:
+        - containerPort: 8080
+      volumeMounts:
+        - name: p-volumeclaim-name
+          mountPath: /home/node/app/dist/sites-enabled
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-poc-service
+spec:
+  selector:
+    app: nginx-poc
+  type: NodePort
+  ports:
+    - name: nginx
+      protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 31000
+    - name: nodejs
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 31001

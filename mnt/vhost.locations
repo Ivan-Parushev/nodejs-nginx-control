@@ -1,0 +1,7 @@
+location /health-check2 {
+    access_log      off;
+    log_not_found   off;
+    expires         -1;
+    add_header      Content-Type text/plain;
+    return          200 "i'm alive!2";
+}
